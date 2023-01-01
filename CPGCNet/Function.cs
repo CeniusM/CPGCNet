@@ -1,6 +1,5 @@
-﻿
-
-using System.Xml.Serialization;
+﻿using SlackingGameEngine.Rendering;
+using System.Security.Cryptography.X509Certificates;
 
 namespace CPGCNet;
 
@@ -102,6 +101,7 @@ internal class Node
         {
             return _value!.GetValue(x);
         }
+        throw new NotImplementedException();
     }
 }
 
@@ -136,9 +136,9 @@ internal class ValueContainer
         Func,
     }
 
-    internal Type type;
-    internal double? Value;
-    internal Func<double, double>? Function;
+    private Type type;
+    private double? Value;
+    private Func<double, double>? Function;
 
     public void SetValue()
     {
@@ -192,34 +192,34 @@ internal class Function
 
     private char[] OperationsAllowed = { '+', '-', '*', '/' };
 
+    internal Color color;
     internal string Name;
-    internal ValueContainer[] values = new ValueContainer[0];
-    internal Operation[] operations = new Operation[0];
+    private Node node;
 
     /// <summary>
     /// 
     /// </summary>
     /// <param name="strFunction"></param>
-    /// <param name="funcs"></param>
-    public Function(string strFunction, Func<double, double> funcs)
+    /// <param name="Funcs"></param>
+    public Function(string strFunction, (string FuncName, Func<double, double> Function)[] Funcs, Color color)
     {
-        SetFunction(strFunction, funcs);
+        SetFunction(strFunction, Funcs);
+        this.color = color;
     }
 
     public double Call(double X)
     {
-        double Value = 0;
-        throw new Exception();
+        return node.GetValue(X);
     }
 
 
     /// <summary>
     /// The strFunction will have other varibles like "aa", so for each non (number and x) the next func will be put in.
-    /// Format example: f(x) = 1 + sin(x) * 0.3 / 3 - x * customFunc(4) :end [funcs.Count == 1]
+    /// Format example: f(x) = 1 + sin(x) * 0.3 / 3 - x * customFunc(4) :end [Funcs.Length == 1]
     /// </summary>
     /// <param name="strFunction"></param>
     /// <param name="funcs"></param>
-    public void SetFunction(string strFunction, Func<double, double> funcs)
+    public void SetFunction(string strFunction, (string FuncName, Func<double, double> Function)[] Funcs)
     {
         Operation GetOperationFromChar(char c)
         {
@@ -236,6 +236,14 @@ internal class Function
                 default:
                     throw new NotImplementedException();
             }
+        }
+        bool IsTokenFunction(string token)
+        {
+            if (token == "x")
+                return false;
+            if (double.TryParse(token, out double foo))
+                return false;
+            return true;
         }
         string ParseName(string str)
         {
@@ -260,108 +268,180 @@ internal class Function
         {
             return str.TakeWhile(x => x != ' ').ToString();
         }
+        List<string> GetTokensFromFunction(string strFunction)
+        {
+            List<string> tokens = new List<string>();
+
+
+            // DID NOT IMPLEMENT... Other way of checking
+            ///*
+            // * Tokens will be the numbers such as "3N" or "0.44N" or "4242n"
+            // * functions will be split into two such as "sinF", "x" or "customFuncF", "4N"
+            // * and inbetween the numbers and the functions(pairs) there will be an
+            // * operation token such as "*O" or "-O" 
+            // * 
+            // * N = number
+            // * F = function
+            // * x = varible: can only be the input varible
+            // * O = operation
+            // */
+
+            // Tokenize
+            string token = "";
+            for (int i = 0; i < strFunction.Length; i++)
+            {
+                if (strFunction[i] == 'x' && token == "")
+                {
+                    tokens.Add("x");
+                }
+                else if (char.IsDigit(strFunction[i]))
+                {
+                    token += strFunction[i];
+                }
+                else if (strFunction[i] == '.')
+                {
+                    token += '.';
+                }
+                else if (OperationsAllowed.Contains(strFunction[i]))
+                {
+                    if (token != "")
+                    {
+                        if (double.TryParse(token, out double d))
+                        {
+                            //token += "N";
+                            tokens.Add(token);
+                        }
+                        else
+                        {
+                            //token += "F";
+                            tokens.Add(token);
+                        }
+                    }
+
+                    //tokens.Add(GetOperationFromChar(strFunction[i]).ToString() + "O");
+                    tokens.Add(GetOperationFromChar(strFunction[i]).ToString());
+                    token = "";
+                }
+                else // Is function
+                {
+                    token += strFunction[i];
+                }
+            }
+
+            // Now unwrap the functions "sin(x)" -> "sin", "x"
+            for (int i = 0; i < tokens.Count(); i++)
+            {
+                string str = tokens[i];
+                tokens.RemoveAt(i);
+                string[] newTokens = str.Split('(');
+                tokens.Insert(i, newTokens[0]); // sin
+                tokens.Insert(++i, newTokens[1].Split(')')[0]); // x
+            }
+
+            return tokens;
+        }
+        Node GetNodeFromTokens(List<string> Tokens)
+        {
+            // Note, this can be used recursively with for example parenthesis
+
+            /* 
+             * Now we try and put into a hierarchy
+             * Example:
+             * 1 + sin(x) * 0.3 / 3 - x * customFunc(4) 
+             * =
+             *              
+             *                "-"
+             *                / \___________
+             *               /              \
+             *             "+"              "*"
+             *             / \              / \
+             *            /   \            /   \
+             *          "1"   "/"        "x"  "Delegate"
+             *                / \                  \
+             *               /   \                  \
+             *             "*"   "3"                "4"
+             *             / \
+             *            /   \
+             *         "sin" "0.3"
+             *          /
+             *         /
+             *       "x" 
+             * 
+             */
+
+            // ValueContainer, either x, function or a value
+            if (Tokens.Count == 1)
+            {
+                ValueContainer val = new ValueContainer();
+                if (Tokens[0] == "x")
+                {
+                    val.SetValue();
+                }
+                else if (double.TryParse(Tokens[0], out double foo))
+                {
+                    val.SetValue(foo);
+                }
+                else // Is function
+                {
+                    // Find the funtion
+                    bool FunctionFound = false;
+                    if (_BuildInFunctions.ContainsKey(Tokens[0]))
+                    {
+                        val.SetValue(_BuildInFunctions[Tokens[0]]);
+                        FunctionFound = true;
+                    }
+                    else
+                    {
+                        for (int i = 0; i < Funcs.Count(); i++)
+                            if (Funcs[i].FuncName == Tokens[0])
+                            {
+                                val.SetValue(Funcs[i].Function);
+                                FunctionFound = true;
+                                break;
+                            }
+                    }
+                    if (!FunctionFound)
+                        throw new Exception("Where not able to find function: " + Tokens[0]);
+                }
+            }
+            // Error
+            else if (Tokens.Count == 2)
+                throw new Exception("Error");
+            // Operator time
+            else if (Tokens.Count == 3)
+            {
+                Operation operation = GetOperationFromChar(Tokens[1][0]);
+                Node tempNode1 = GetNodeFromTokens(new List<string> { Tokens[0] });
+                Node tempNode2 = GetNodeFromTokens(new List<string> { Tokens[2] });
+                return new Node(tempNode1, tempNode2, operation);
+            }
+
+            // We go from right to left and slowly build up the nodes
+            Node? node1;
+            Node? node2;
+            for (int i = 0; i < Tokens.Count(); i++)
+            {
+                if (Operation.Mul == GetOperationFromChar(Tokens[i][0]))
+                {
+
+                }
+                else if (Operation.Div == GetOperationFromChar(Tokens[i][0]))
+                {
+
+                }
+            }
+
+            // After we do the same with + and -
+
+
+
+            throw new NotImplementedException();
+        }
 
         strFunction = ParseName(strFunction);
         strFunction = GetExpresion(strFunction);
         strFunction = RemoveSpaces(strFunction);
-
-        List<string> tokens = new List<string>();
-
-        /*
-         * Tokens will be the numbers such as "3N" or "0.44N" or "4242n"
-         * functions will be split into two such as "sinF", "x" or "customFuncF", "4N"
-         * and inbetween the numbers and the functions(pairs) there will be an
-         * operation token such as "*O" or "-O" 
-         * 
-         * N = number
-         * F = function
-         * x = varible: can only be the input varible
-         * O = operation
-         */
-
-        // Tokenize
-        string token = "";
-        for (int i = 0; i < strFunction.Length; i++)
-        {
-            if (strFunction[i] == 'x' && token == "")
-            {
-                tokens.Add("x");
-            }
-            else if (char.IsDigit(strFunction[i]))
-            {
-                token += strFunction[i];
-            }
-            else if (strFunction[i] == '.')
-            {
-                token += '.';
-            }
-            else if (OperationsAllowed.Contains(strFunction[i]))
-            {
-                if (token != "")
-                {
-                    if (double.TryParse(token, out double d))
-                    {
-                        token += "N";
-                        tokens.Add(token);
-                    }
-                    else
-                    {
-                        token += "F";
-                        tokens.Add(token);
-                    }
-                }
-
-                tokens.Add(GetOperationFromChar(strFunction[i]).ToString() + "O");
-                token = "";
-            }
-            else // Is function
-            {
-                token += strFunction[i];
-            }
-        }
-
-        // Now unwrap the functions "sin(x)" -> "sin", "x"
-        for (int i = 0; i < tokens.Count(); i++)
-        {
-            string str = tokens[i];
-            tokens.RemoveAt(i);
-            string[] newTokens = str.Split('(');
-            tokens.Insert(i, newTokens[0]); // sin
-            tokens.Insert(++i, newTokens[1].Split(')')[0]); // x
-        }
-
-
-
-        // Now tokenized
-
-        /* 
-         * Now we try and put into a hierarchy
-         * Example:
-         * 1 + sin(x) * 0.3 / 3 - x * customFunc(4) 
-         * =
-         *              
-         *              
-         *              
-         *                "-"
-         *                / \___________
-         *               /              \
-         *             "+"              "*"
-         *             / \              / \
-         *            /   \            /   \
-         *          "1"   "/"        "x"  "Delegate"
-         *                / \                  \
-         *               /   \                  \
-         *             "*"   "3"                "4"
-         *             / \
-         *            /   \
-         *         "sin" "0.3"
-         *          /
-         *         /
-         *       "x" 
-         * 
-         */
-
-
-
+        var Tokens = GetTokensFromFunction(strFunction);
+        node = GetNodeFromTokens(Tokens);
     }
 }
