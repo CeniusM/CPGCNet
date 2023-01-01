@@ -105,4 +105,14 @@ internal class Function
     {
         throw new NotImplementedException();
     }
+
+    /// <summary>
+    /// a(x) = ...
+    /// </summary>
+    /// <param name="strFunc"></param>
+    /// <returns></returns>
+    public static Function GetFunction(string strFunc)
+    {
+
+    }
 }

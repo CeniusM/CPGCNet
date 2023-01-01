@@ -1,0 +1,43 @@
+﻿
+
+- Fix what comes first in all the struct, classes and methods
+
+- Fix RenderRect going on the other side when going through the left side
+
+- Fix the keyboard state class
+
+- Fix RenderRect drawing behind the allocated array
+
+- Fix the keyboard class and key enums
+
+- Fix the flags of the command prompt (Mouse selecting)
+
+- Fix all the difrent usses of int, uint, short, ushort
+
+- Make it so the keyboard class only updates when the user is activly using the command prompt
+
+- Clean up the CommandPrompt handle
+
+- Added more acsesebility for the user to change the command prompt via the CommandPropmt Handlers methods
+
+- Implement an array of shades, so 0 is dark and the heigher the lighter
+
+- Implement a RGBA array with the Pixel(Reprsented as uint) that represents that RGBA value the most by using an algorithm to cauculate them
+
+- Implement a sprite system
+
+- Implement text renderer
+
+- Implement correct zoom for reselution (Maby with try catch until the zoom is small enough)
+
+- Implement Mouse controls
+
+- Implement Vector struct
+
+- Implement Collision for dots, square, lines, spheres and so on
+
+- Implement DDA Algorithm
+
+- Implement a sound system
+
+- Implement it so that the engine can allocate unmanged code it, it self will clear up after use
