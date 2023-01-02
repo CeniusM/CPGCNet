@@ -12,7 +12,17 @@ List<(string Name, Func<double, double> func)> funcList = new List<(string Name,
 while (true)
 {
     string Input = Console.ReadLine();
-
+    if (Input.ToUpper() == "CLEAR")
+    {
+        Functions.Clear();
+        funcList.Clear();
+        continue;
+    }
+    if (Input.ToUpper() == "HELP")
+    {
+        //...
+        continue;
+    }
     try
     {
         if (int.TryParse(Input.Split('(')[1].Split(')')[0], out int num)) // Name(10) // call function

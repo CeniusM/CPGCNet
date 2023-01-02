@@ -131,7 +131,7 @@ internal class ValueContainer
     private Type type;
     private double? Value;
     private Func<double, double>? Function;
-    private ValueContainer? FunVal;
+    private ValueContainer? FuncVal;
 
     public void SetValue(bool negativ = false)
     {
@@ -155,7 +155,7 @@ internal class ValueContainer
         type = Type.Func;
         Value = null;
         Function = Func;
-        this.FunVal = funcVal;
+        this.FuncVal = funcVal;
     }
 
     public double GetValue(double x)
@@ -169,7 +169,7 @@ internal class ValueContainer
             case Type.Value:
                 return Value.Value;
             case Type.Func:
-                return Function.Invoke(FunVal.GetValue(x));
+                return Function.Invoke(FuncVal.GetValue(x));
             default:
                 throw new NotImplementedException();
         }
@@ -268,6 +268,23 @@ internal class Function
                 if (str[i] != ' ')
                     newString.Append(str[i]);
             return newString.ToString();
+        }
+        ValueContainer GetValueContainorFromtoken(string token)
+        {
+            ValueContainer val = new ValueContainer();
+            if (token == "x")
+            {
+                val.SetValue();
+            }
+            else if (token == "-x")
+            {
+                val.SetValue(true);
+            }
+            else if (double.TryParse(token, out double foo))
+            {
+                val.SetValue(foo);
+            }
+            return val;
         }
         List<string> GetTokensFromFunction(string strFunction)
         {
@@ -384,20 +401,7 @@ internal class Function
             // ValueContainer, either x, function or a value
             if (Tokens.Count == 1)
             {
-                ValueContainer val = new ValueContainer();
-                if (Tokens[0] == "x")
-                {
-                    val.SetValue();
-                }
-                else if (Tokens[0] == "-x")
-                {
-                    val.SetValue(true);
-                }
-                else if (double.TryParse(Tokens[0], out double foo))
-                {
-                    val.SetValue(foo);
-                }
-                return new Node(val);
+                return new Node(GetValueContainorFromtoken(Tokens[0]));
             }
             // A function
             else if (Tokens.Count == 2)
@@ -408,18 +412,7 @@ internal class Function
                 bool FunctionFound = false;
                 if (_BuildInFunctions.ContainsKey(Tokens[0]))
                 {
-                    if (Tokens[1] == "x")
-                    {
-                        funcVal.SetValue();
-                    }
-                    else if (Tokens[1] == "-x")
-                    {
-                        funcVal.SetValue(true);
-                    }
-                    else if (double.TryParse(Tokens[1], out double foo))
-                    {
-                        funcVal.SetValue(foo);
-                    }
+                    funcVal = GetValueContainorFromtoken(Tokens[1]);
                     func.SetValue(_BuildInFunctions[Tokens[0]], funcVal);
                     FunctionFound = true;
                 }
@@ -428,24 +421,8 @@ internal class Function
                     for (int i = 0; i < Funcs.Count(); i++)
                         if (Funcs[i].FuncName == Tokens[0])
                         {
-                            if (Tokens[1] == "x")
-                            {
-                                funcVal.SetValue();
-                            }
-                            else if (Tokens[1] == "-x")
-                            {
-                                funcVal.SetValue(true);
-                            }
-                            else if (double.TryParse(Tokens[1], out double foo))
-                            {
-                                funcVal.SetValue(foo);
-                            }
-                            for (int i = 0; i < Funcs.length; i++)
-                            {
-                                if ()
-                                func.SetValue(Funcs[Tokens[0]], funcVal);
-
-                            }
+                            funcVal = GetValueContainorFromtoken(Tokens[1]);
+                            func.SetValue(Funcs[i].Function, funcVal);
                             FunctionFound = true;
                             break;
                         }
