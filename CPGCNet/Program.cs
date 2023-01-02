@@ -39,7 +39,7 @@ while (true)
                 Console.WriteLine(e.Message);
             }
         }
-        else
+        else // try save the function
         {
             try
             {
