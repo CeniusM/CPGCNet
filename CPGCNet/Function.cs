@@ -178,14 +178,19 @@ internal class ValueContainer
 
 internal class Function
 {
-    private Dictionary<string, Func<double, double>> _BuildInFunctions = new Dictionary<string, Func<double, double>>()
+    private static readonly Dictionary<string, Func<double, double>> _BuildInFunctions = new Dictionary<string, Func<double, double>>()
     {
         { "sin", x => Math.Sin(x) },
         { "cos", x => Math.Cos(x) },
         { "tan", x => Math.Tan(x) },
         { "sqrt", x => Math.Sqrt(x) },
+        { "log", x => Math.Log(x) },
+        { "abs", x => Math.Abs(x) },
         { "square", x => x * x },
+        { "PI", x => Math.PI },
+        { "E", x => Math.E },
     };
+    public static bool FunctionAllreadyBuildIn(string functionName) => _BuildInFunctions.ContainsKey(functionName);
 
     private char[] OperationsAllowed = { '+', '-', '*', '/' };
 
@@ -283,6 +288,10 @@ internal class Function
             else if (double.TryParse(token, out double foo))
             {
                 val.SetValue(foo);
+            }
+            else if (_BuildInFunctions.ContainsKey(token))
+            {
+                val.SetValue(_BuildInFunctions[token], new ValueContainer());
             }
             return val;
         }
@@ -485,6 +494,8 @@ internal class Function
         }
 
         strFunction = ParseName(strFunction);
+        if (_BuildInFunctions.ContainsKey(Name))
+            throw new Exception("The function " + Name + " allready exist");
         strFunction = GetExpresion(strFunction);
         strFunction = RemoveSpaces(strFunction);
         var Tokens = GetTokensFromFunction(strFunction);

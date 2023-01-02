@@ -16,6 +16,7 @@ while (true)
     {
         Functions.Clear();
         funcList.Clear();
+        Console.Clear();
         continue;
     }
     if (Input.ToUpper() == "HELP")
@@ -25,7 +26,9 @@ while (true)
     }
     try
     {
-        if (int.TryParse(Input.Split('(')[1].Split(')')[0], out int num)) // Name(10) // call function
+        for (int i = 0; i < Input.Length; i++)
+            Input = Input.Replace('.', ',');
+        if (double.TryParse(Input.Split('(')[1].Split(')')[0], out double num)) // Name(10) // call function
         {
             try
             {
