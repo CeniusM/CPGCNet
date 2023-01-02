@@ -9,7 +9,7 @@
  * Multi argumental functions
  * Operators ! ^
  * Better const/varible expersions
- * 
+ * Remove Any spaves from names
  */
 
 using CPGCNet;
