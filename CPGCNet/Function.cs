@@ -1,5 +1,5 @@
 ﻿using SlackingGameEngine.Rendering;
-using System.Security.Cryptography.X509Certificates;
+using System.Text;
 
 namespace CPGCNet;
 
@@ -35,8 +35,6 @@ internal enum Operation
     ///// </summary>
     //ParEnd,
 }
-
-
 
 internal class Node
 {
@@ -105,17 +103,6 @@ internal class Node
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-
 internal class ValueContainer
 {
     internal enum Type
@@ -124,6 +111,11 @@ internal class ValueContainer
         /// This is where x will be set in
         /// </summary>
         Varible,
+
+        /// <summary>
+        /// This is where -x will be set in
+        /// </summary>
+        negVarible,
 
         /// <summary>
         /// This is just any abatrary double value
@@ -139,10 +131,14 @@ internal class ValueContainer
     private Type type;
     private double? Value;
     private Func<double, double>? Function;
+    private ValueContainer? FunVal;
 
-    public void SetValue()
+    public void SetValue(bool negativ = false)
     {
-        type = Type.Varible;
+        if (negativ)
+            type = Type.negVarible;
+        else
+            type = Type.Varible;
         Value = null;
         Function = null;
     }
@@ -154,11 +150,12 @@ internal class ValueContainer
         Function = null;
     }
 
-    public void SetValue(Func<double, double> Func)
+    public void SetValue(Func<double, double> Func, ValueContainer funcVal)
     {
         type = Type.Func;
         Value = null;
         Function = Func;
+        this.FunVal = funcVal;
     }
 
     public double GetValue(double x)
@@ -167,13 +164,12 @@ internal class ValueContainer
         {
             case Type.Varible:
                 return x;
-                break;
+            case Type.negVarible:
+                return -x;
             case Type.Value:
                 return Value.Value;
-                break;
             case Type.Func:
-                return Function.Invoke(x);
-                break;
+                return Function.Invoke(FunVal.GetValue(x));
             default:
                 throw new NotImplementedException();
         }
@@ -188,6 +184,7 @@ internal class Function
         { "cos", x => Math.Cos(x) },
         { "tan", x => Math.Tan(x) },
         { "sqrt", x => Math.Sqrt(x) },
+        { "square", x => x * x },
     };
 
     private char[] OperationsAllowed = { '+', '-', '*', '/' };
@@ -234,7 +231,7 @@ internal class Function
                 case '/':
                     return Operation.Div;
                 default:
-                    throw new NotImplementedException();
+                    return (Operation)404;
             }
         }
         bool IsTokenFunction(string token)
@@ -257,8 +254,8 @@ internal class Function
                 throw new Exception("There have not been found any name");
             if (lastIndex == str.Length - 1)
                 throw new Exception("Invalid function found in ParseName");
-            Name = str.Take(lastIndex).ToString();
-            return str.Take(new Range(lastIndex, str.Length - 1)).ToString();
+            Name = string.Join("", str.Take(lastIndex));
+            return string.Join("", str.Take(new Range(lastIndex, str.Length)));
         }
         string GetExpresion(string str)
         {
@@ -266,7 +263,11 @@ internal class Function
         }
         string RemoveSpaces(string str)
         {
-            return str.TakeWhile(x => x != ' ').ToString();
+            StringBuilder newString = new StringBuilder(str.Length);
+            for (int i = 0; i < str.Length; i++)
+                if (str[i] != ' ')
+                    newString.Append(str[i]);
+            return newString.ToString();
         }
         List<string> GetTokensFromFunction(string strFunction)
         {
@@ -292,15 +293,20 @@ internal class Function
             {
                 if (strFunction[i] == 'x' && token == "")
                 {
-                    tokens.Add("x");
+                    //tokens.Add("x");
+                    token += "x";
                 }
                 else if (char.IsDigit(strFunction[i]))
                 {
                     token += strFunction[i];
                 }
-                else if (strFunction[i] == '.')
+                else if (strFunction[i] == ',' || strFunction[i] == '.')
                 {
-                    token += '.';
+                    token += ',';
+                }
+                else if (strFunction[i] == '-' && token == "")
+                {
+                    token += "-";
                 }
                 else if (OperationsAllowed.Contains(strFunction[i]))
                 {
@@ -319,7 +325,8 @@ internal class Function
                     }
 
                     //tokens.Add(GetOperationFromChar(strFunction[i]).ToString() + "O");
-                    tokens.Add(GetOperationFromChar(strFunction[i]).ToString());
+                    //tokens.Add(GetOperationFromChar(strFunction[i]).ToString());
+                    tokens.Add(new string(strFunction[i], 1));
                     token = "";
                 }
                 else // Is function
@@ -327,22 +334,27 @@ internal class Function
                     token += strFunction[i];
                 }
             }
+            if (token != "")
+                tokens.Add(token);
 
             // Now unwrap the functions "sin(x)" -> "sin", "x"
             for (int i = 0; i < tokens.Count(); i++)
             {
                 string str = tokens[i];
-                tokens.RemoveAt(i);
-                string[] newTokens = str.Split('(');
-                tokens.Insert(i, newTokens[0]); // sin
-                tokens.Insert(++i, newTokens[1].Split(')')[0]); // x
+                if (str.Contains('(') && str.Contains(')'))
+                {
+                    tokens.RemoveAt(i);
+                    string[] newTokens = str.Split('(');
+                    tokens.Insert(i, newTokens[0]); // sin
+                    tokens.Insert(++i, newTokens[1].Split(')')[0]); // x
+                }
             }
 
             return tokens;
         }
         Node GetNodeFromTokens(List<string> Tokens)
         {
-            // Note, this can be used recursively with for example parenthesis
+            // You can call this with only the tokens in a pahrentesies and make a node from it
 
             /* 
              * Now we try and put into a hierarchy
@@ -377,36 +389,72 @@ internal class Function
                 {
                     val.SetValue();
                 }
+                else if (Tokens[0] == "-x")
+                {
+                    val.SetValue(true);
+                }
                 else if (double.TryParse(Tokens[0], out double foo))
                 {
                     val.SetValue(foo);
                 }
-                else // Is function
-                {
-                    // Find the funtion
-                    bool FunctionFound = false;
-                    if (_BuildInFunctions.ContainsKey(Tokens[0]))
-                    {
-                        val.SetValue(_BuildInFunctions[Tokens[0]]);
-                        FunctionFound = true;
-                    }
-                    else
-                    {
-                        for (int i = 0; i < Funcs.Count(); i++)
-                            if (Funcs[i].FuncName == Tokens[0])
-                            {
-                                val.SetValue(Funcs[i].Function);
-                                FunctionFound = true;
-                                break;
-                            }
-                    }
-                    if (!FunctionFound)
-                        throw new Exception("Where not able to find function: " + Tokens[0]);
-                }
+                return new Node(val);
             }
-            // Error
+            // A function
             else if (Tokens.Count == 2)
-                throw new Exception("Error");
+            {
+                ValueContainer func = new ValueContainer();
+                ValueContainer funcVal = new ValueContainer();
+                // Find the funtion
+                bool FunctionFound = false;
+                if (_BuildInFunctions.ContainsKey(Tokens[0]))
+                {
+                    if (Tokens[1] == "x")
+                    {
+                        funcVal.SetValue();
+                    }
+                    else if (Tokens[1] == "-x")
+                    {
+                        funcVal.SetValue(true);
+                    }
+                    else if (double.TryParse(Tokens[1], out double foo))
+                    {
+                        funcVal.SetValue(foo);
+                    }
+                    func.SetValue(_BuildInFunctions[Tokens[0]], funcVal);
+                    FunctionFound = true;
+                }
+                else
+                {
+                    for (int i = 0; i < Funcs.Count(); i++)
+                        if (Funcs[i].FuncName == Tokens[0])
+                        {
+                            if (Tokens[1] == "x")
+                            {
+                                funcVal.SetValue();
+                            }
+                            else if (Tokens[1] == "-x")
+                            {
+                                funcVal.SetValue(true);
+                            }
+                            else if (double.TryParse(Tokens[1], out double foo))
+                            {
+                                funcVal.SetValue(foo);
+                            }
+                            for (int i = 0; i < Funcs.length; i++)
+                            {
+                                if ()
+                                func.SetValue(Funcs[Tokens[0]], funcVal);
+
+                            }
+                            FunctionFound = true;
+                            break;
+                        }
+                }
+                if (!FunctionFound)
+                    throw new Exception("Where not able to find function: " + Tokens[0]);
+                else
+                    return new Node(func);
+            }
             // Operator time
             else if (Tokens.Count == 3)
             {
@@ -417,23 +465,44 @@ internal class Function
             }
 
             // We go from right to left and slowly build up the nodes
-            Node? node1;
-            Node? node2;
-            for (int i = 0; i < Tokens.Count(); i++)
+            // We break down the right and left side and make them into node recursively
+            Node? MainNode;
+            for (int i = Tokens.Count() - 1; i >= 0; i--)
             {
-                if (Operation.Mul == GetOperationFromChar(Tokens[i][0]))
+                if (Operation.Add == GetOperationFromChar(Tokens[i][0]) && Tokens[i].Length == 1)
                 {
-
+                    MainNode = new Node(GetNodeFromTokens(Tokens.Take(new Range(0, i)).ToList()), // [0, i[
+                        GetNodeFromTokens(Tokens.Take(new Range(i + 1, Tokens.Count())).ToList()), // ]i, endIndex]
+                        Operation.Add);
+                    return MainNode;
                 }
-                else if (Operation.Div == GetOperationFromChar(Tokens[i][0]))
+                else if (Operation.Sub == GetOperationFromChar(Tokens[i][0]) && Tokens[i].Length == 1)
                 {
-
+                    MainNode = new Node(GetNodeFromTokens(Tokens.Take(new Range(0, i)).ToList()), // [0, i[
+                        GetNodeFromTokens(Tokens.Take(new Range(i + 1, Tokens.Count())).ToList()), // ]i, endIndex]
+                        Operation.Sub);
+                    return MainNode;
                 }
             }
 
-            // After we do the same with + and -
-
-
+            // After we do the same with * and /
+            for (int i = Tokens.Count() - 1; i >= 0; i--)
+            {
+                if (Operation.Div == GetOperationFromChar(Tokens[i][0]) && Tokens[i].Length == 1)
+                {
+                    MainNode = new Node(GetNodeFromTokens(Tokens.Take(new Range(0, i)).ToList()), // [0, i[
+                        GetNodeFromTokens(Tokens.Take(new Range(i + 1, Tokens.Count())).ToList()), // ]i, endIndex]
+                        Operation.Div);
+                    return MainNode;
+                }
+                else if (Operation.Mul == GetOperationFromChar(Tokens[i][0]) && Tokens[i].Length == 1)
+                {
+                    MainNode = new Node(GetNodeFromTokens(Tokens.Take(new Range(0, i)).ToList()), // [0, i[
+                        GetNodeFromTokens(Tokens.Take(new Range(i + 1, Tokens.Count())).ToList()), // ]i, endIndex]
+                        Operation.Mul);
+                    return MainNode;
+                }
+            }
 
             throw new NotImplementedException();
         }
