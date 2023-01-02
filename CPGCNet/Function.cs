@@ -453,7 +453,8 @@ internal class Function
             // We go from right to left and slowly build up the nodes
             // We break down the right and left side and make them into node recursively
             Node? MainNode;
-            for (int i = Tokens.Count() - 1; i >= 0; i--)
+            //for (int i = Tokens.Count() - 1; i >= 0; i--)
+            for (int i = 0; i < Tokens.Count(); i++)
             {
                 if (Operation.Add == GetOperationFromChar(Tokens[i][0]) && Tokens[i].Length == 1)
                 {
@@ -472,7 +473,8 @@ internal class Function
             }
 
             // After we do the same with * and /
-            for (int i = Tokens.Count() - 1; i >= 0; i--)
+            //for (int i = Tokens.Count() - 1; i >= 0; i--)
+            for (int i = 0; i < Tokens.Count(); i++)
             {
                 if (Operation.Div == GetOperationFromChar(Tokens[i][0]) && Tokens[i].Length == 1)
                 {

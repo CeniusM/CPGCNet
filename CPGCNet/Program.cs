@@ -1,5 +1,17 @@
 ﻿// CommandPromptGraphingCalculator
 
+/*
+ * Idears:
+ * Inplement ( and )
+ * Use = to see if it is a function decleration
+ * Implement it so you can see what goes wrong and where
+ * Use polymothy for the nodes to simplefy
+ * Multi argumental functions
+ * Operators ! ^
+ * Better const/varible expersions
+ * 
+ */
+
 using CPGCNet;
 using SlackingGameEngine.Rendering;
 
