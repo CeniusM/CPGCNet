@@ -437,7 +437,7 @@ internal class Function
                         }
                 }
                 if (!FunctionFound)
-                    throw new Exception("Where not able to find function: " + Tokens[0]);
+                    throw new Exception("Were not able to find function: " + Tokens[0]);
                 else
                     return new Node(func);
             }
