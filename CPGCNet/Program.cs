@@ -30,7 +30,7 @@ Functions:
     sqrt
     log
     abs
-    square, sqr 
+    sqr 
     PI
     E
 ";
