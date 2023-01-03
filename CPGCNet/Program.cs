@@ -9,7 +9,8 @@
  * Multi argumental functions
  * Operators ! ^
  * Better const/varible expersions
- * 
+ * Add debuging util 
+ * Change the node func to use another rather that a ValueContainor
  */
 
 using CPGCNet;
