@@ -2,7 +2,7 @@
 
 /*
  * Ideas:
- * Inplement "()"
+ * Implement "()"
  * Use = to see if it is a function decleration
  * Implement it so you can see what goes wrong and where
  * Use polymothy for the nodes to simplefy
@@ -23,7 +23,9 @@ List<(string Name, Func<double, double> func)> funcList = new List<(string Name,
 
 while (true)
 {
+    Console.Write(">>> ");
     string? Input = Console.ReadLine();
+    // clears functions and prompt screen
     if (Input?.ToUpper() == "CLEAR")
     {
         Functions.Clear();
