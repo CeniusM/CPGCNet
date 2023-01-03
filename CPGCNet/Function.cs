@@ -300,7 +300,6 @@ internal class Function
         {
             List<string> tokens = new List<string>();
 
-
             // Tokenize
             string token = "";
             for (int i = 0; i < strFunction.Length; i++)
