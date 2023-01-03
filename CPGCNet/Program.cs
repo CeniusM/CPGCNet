@@ -11,7 +11,7 @@
  * Better const/varible expersions
  * Remove Any spaves from names
  * Add debuging util 
-
+ * Change the node func to use another rather that a ValueContainor
  */
 
 using CPGCNet;
