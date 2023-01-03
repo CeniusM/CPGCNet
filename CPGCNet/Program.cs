@@ -2,7 +2,7 @@
 
 /*
  * Idears:
- * Inplement ( and )
+ * Inplement "()"
  * Use = to see if it is a function decleration
  * Implement it so you can see what goes wrong and where
  * Use polymothy for the nodes to simplefy
