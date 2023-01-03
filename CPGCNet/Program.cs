@@ -18,16 +18,20 @@ using SlackingGameEngine.Rendering;
 
 string help_message()
 {
-    string help_string = @"CLEAR: Clears all functions and display.
+    string help_string = @"
+CLEAR: Clears all functions and display.
 HELP:  This help message.
-EXIT:  Exits the program.";
+EXIT:  Exits the program.
+";
     return help_string;
 }
 
 string usage_message()
 {
-    string usage_string = @">>> f(x) = x+2
-f(2) = 4";
+    string usage_string = @"
+>>> f(x) = x+2
+f(2) = 4
+";
     return usage_string;
 }
 
