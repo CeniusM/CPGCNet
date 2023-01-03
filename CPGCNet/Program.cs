@@ -18,21 +18,20 @@ using SlackingGameEngine.Rendering;
 
 
 
-//Function function = new Function("f(x)=1", new (string FuncName, Func<double, double> Function)[0], Color.Red);
 Dictionary<string, Function> Functions = new Dictionary<string, Function>();
 List<(string Name, Func<double, double> func)> funcList = new List<(string Name, Func<double, double> func)>();
 
 while (true)
 {
-    string Input = Console.ReadLine();
-    if (Input.ToUpper() == "CLEAR")
+    string? Input = Console.ReadLine();
+    if (Input?.ToUpper() == "CLEAR")
     {
         Functions.Clear();
         funcList.Clear();
         Console.Clear();
         continue;
     }
-    if (Input.ToUpper() == "HELP")
+    if (Input?.ToUpper() == "HELP")
     {
         //...
         continue;
