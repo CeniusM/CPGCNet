@@ -495,11 +495,11 @@ internal class Function
             throw new NotImplementedException();
         }
 
+        strFunction = RemoveSpaces(strFunction);
         strFunction = ParseName(strFunction);
         if (_BuildInFunctions.ContainsKey(Name))
             throw new Exception("The function " + Name + " allready exist");
         strFunction = GetExpresion(strFunction);
-        strFunction = RemoveSpaces(strFunction);
         var Tokens = GetTokensFromFunction(strFunction);
         node = GetNodeFromTokens(Tokens);
     }
