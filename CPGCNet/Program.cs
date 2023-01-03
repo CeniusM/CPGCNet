@@ -16,15 +16,36 @@
 using CPGCNet;
 using SlackingGameEngine.Rendering;
 
+string help_message()
+{
+    string help_string = @"
+    CLEAR: Clears all functions and display.
+    HELP:  This help message.
+    EXIT:  Exits the program.";
+    return help_string;
+}
 
+string usage_message()
+{
+    string usage_string = @"
+    >>> f(x) = x+2
+    f(2) = 4";
+    return usage_string;
+}
 
 Dictionary<string, Function> Functions = new Dictionary<string, Function>();
 List<(string Name, Func<double, double> func)> funcList = new List<(string Name, Func<double, double> func)>();
 
 while (true)
 {
+    // CLI prompt 
     Console.Write(">>> ");
     string? Input = Console.ReadLine();
+    // prints help if no command given
+    if (Input == "")
+    {
+        Console.WriteLine(help_message());
+    }
     // clears functions and prompt screen
     if (Input?.ToUpper() == "CLEAR")
     {
@@ -35,12 +56,17 @@ while (true)
     }
     if (Input?.ToUpper() == "HELP")
     {
-        // ADD HELP MESSAGE
-        Console.WriteLine("help message");
+        Console.WriteLine(help_message());
         continue;
     }
+    // USAGE command
+    if (Input?.ToUpper() == "USAGE")
+    {
+        Console.WriteLine(usage_message());
+    }
     // EXIT command
-    if (Input?.ToUpper() == "EXIT") {
+    if (Input?.ToUpper() == "EXIT")
+    {
         Environment.Exit(0);
     }
     try
@@ -73,24 +99,12 @@ while (true)
             }
             catch (Exception e)
             {
-                Console.WriteLine("<DEBUG>");
-                Console.WriteLine("inner catch"); // DEBUG
-                Console.WriteLine(e);
-                Console.WriteLine(e.StackTrace);
-                Console.WriteLine(e.Source);
-                Console.WriteLine("</DEBUG>");
                 Console.WriteLine(e.Message);
             }
         }
     }
     catch (Exception e)
     {
-        Console.WriteLine("<DEBUG>");
-        Console.WriteLine("outer catch"); // DEBUG
-        Console.WriteLine(e);
-        Console.WriteLine(e.StackTrace);
-        Console.WriteLine(e.Source);
-        Console.WriteLine("</DEBUG>");
         Console.WriteLine(e.Message);
     }
 }
