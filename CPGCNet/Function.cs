@@ -299,20 +299,6 @@ internal class Function
         {
             List<string> tokens = new List<string>();
 
-
-            // DID NOT IMPLEMENT... Other way of checking
-            ///*
-            // * Tokens will be the numbers such as "3N" or "0.44N" or "4242n"
-            // * functions will be split into two such as "sinF", "x" or "customFuncF", "4N"
-            // * and inbetween the numbers and the functions(pairs) there will be an
-            // * operation token such as "*O" or "-O" 
-            // * 
-            // * N = number
-            // * F = function
-            // * x = varible: can only be the input varible
-            // * O = operation
-            // */
-
             // Tokenize
             string token = "";
             for (int i = 0; i < strFunction.Length; i++)
