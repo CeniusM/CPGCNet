@@ -39,6 +39,10 @@ while (true)
         Console.WriteLine("help message");
         continue;
     }
+    // EXIT command
+    if (Input?.ToUpper() == "EXIT") {
+        Environment.Exit(0);
+    }
     try
     {
         for (int i = 0; i < Input?.Length; i++)
