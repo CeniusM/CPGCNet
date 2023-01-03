@@ -20,8 +20,19 @@ string help_message()
 {
     string help_string = @"
 CLEAR: Clears all functions and display.
-HELP:  This help message.
+HELP:  Displays this help message.
+USAGE: Displays usage of the program.
 EXIT:  Exits the program.
+Functions:
+    sin
+    cos
+    tan
+    sqrt
+    log
+    abs
+    square, sqr 
+    PI
+    E
 ";
     return help_string;
 }
