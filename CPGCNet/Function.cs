@@ -186,10 +186,10 @@ internal class Function
         { "sqrt", x => Math.Sqrt(x) },
         { "log", x => Math.Log(x) },
         { "abs", x => Math.Abs(x) },
-        { "square", x => x * x },
         { "sqr", x => x * x},
         { "PI", x => Math.PI },
         { "E", x => Math.E },
+        { "floor", x => Math.Floor(x) },
     };
     public static bool FunctionAllreadyBuildIn(string functionName) => _BuildInFunctions.ContainsKey(functionName);
 
@@ -301,19 +301,6 @@ internal class Function
             List<string> tokens = new List<string>();
 
 
-            // DID NOT IMPLEMENT... Other way of checking
-            ///*
-            // * Tokens will be the numbers such as "3N" or "0.44N" or "4242n"
-            // * functions will be split into two such as "sinF", "x" or "customFuncF", "4N"
-            // * and inbetween the numbers and the functions(pairs) there will be an
-            // * operation token such as "*O" or "-O" 
-            // * 
-            // * N = number
-            // * F = function
-            // * x = varible: can only be the input varible
-            // * O = operation
-            // */
-
             // Tokenize
             string token = "";
             for (int i = 0; i < strFunction.Length; i++)
@@ -382,7 +369,7 @@ internal class Function
              * Now we try and put into a hierarchy
              * Example:
              * 1 + sin(x) * 0.3 / 3 - x * customFunc(4) 
-             * =
+             *  
              *              
              *                "-"
              *                / \___________
