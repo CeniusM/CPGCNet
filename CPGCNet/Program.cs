@@ -30,6 +30,7 @@ string usage_message()
 {
     string usage_string = @"
 >>> f(x) = x+2
+>>> f(2)
 f(2) = 4
 ";
     return usage_string;
