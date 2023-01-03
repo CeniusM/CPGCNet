@@ -33,7 +33,8 @@ while (true)
     }
     if (Input?.ToUpper() == "HELP")
     {
-        //...
+        // ADD HELP MESSAGE
+        Console.WriteLine("help message");
         continue;
     }
     try
