@@ -22,7 +22,7 @@ A command prompt based graphing calculator that allows you to define and call fu
 
 ## Example
 
-```
+```CPGC
 f(x) = x^2
 g(x) = x^3
 
