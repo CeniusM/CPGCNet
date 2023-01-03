@@ -187,6 +187,7 @@ internal class Function
         { "log", x => Math.Log(x) },
         { "abs", x => Math.Abs(x) },
         { "square", x => x * x },
+        { "sqr", x => x * x},
         { "PI", x => Math.PI },
         { "E", x => Math.E },
     };
