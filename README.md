@@ -23,11 +23,11 @@ A command prompt based graphing calculator that allows you to define and call fu
 ## Example
 
 ```CPGC
-f(x) = x^2
-g(x) = x^3
+f(x) = x+2
+g(x) = x+5
 
 f(2)
 >> 4
-g(2)
->> 8
+g(5)
+>> 10
 ```
