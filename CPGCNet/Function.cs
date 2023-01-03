@@ -51,7 +51,7 @@ internal class Node
     private Type _type;
 
     private Operation _operation;
-    private ValueContainer _value;
+    private ValueContainer? _value;
 
     /// <summary>
     /// Opertation Node
