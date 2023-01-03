@@ -1,7 +1,7 @@
 ﻿// CommandPromptGraphingCalculator
 
 /*
- * Idears:
+ * Ideas:
  * Inplement "()"
  * Use = to see if it is a function decleration
  * Implement it so you can see what goes wrong and where
@@ -58,8 +58,7 @@ while (true)
         {
             try
             {
-                //function = new Function(Input, new (string FuncName, Func<double, double> Function)[0], Color.Red);
-                Function function = new Function(Input, funcList.ToArray(), Color.Red);
+                Function function = new Function(Input ?? "", funcList.ToArray(), Color.Red); // input is empty if null
                 Functions.Add(function.Name, function);
                 funcList.Add((function.Name, (x) => function.Call(x)));
                 continue;
@@ -74,7 +73,4 @@ while (true)
     {
         Console.WriteLine(e.Message);
     }
-
-
-
 }
