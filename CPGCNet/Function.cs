@@ -319,7 +319,6 @@ internal class Function
             {
                 if (strFunction[i] == 'x' && token == "")
                 {
-                    //tokens.Add("x");
                     token += "x";
                 }
                 else if (char.IsDigit(strFunction[i]))
@@ -340,18 +339,14 @@ internal class Function
                     {
                         if (double.TryParse(token, out double d))
                         {
-                            //token += "N";
                             tokens.Add(token);
                         }
                         else
                         {
-                            //token += "F";
                             tokens.Add(token);
                         }
                     }
 
-                    //tokens.Add(GetOperationFromChar(strFunction[i]).ToString() + "O");
-                    //tokens.Add(GetOperationFromChar(strFunction[i]).ToString());
                     tokens.Add(new string(strFunction[i], 1));
                     token = "";
                 }
@@ -453,7 +448,6 @@ internal class Function
             // We go from right to left and slowly build up the nodes
             // We break down the right and left side and make them into node recursively
             Node? MainNode;
-            //for (int i = Tokens.Count() - 1; i >= 0; i--)
             for (int i = 0; i < Tokens.Count(); i++)
             {
                 if (Operation.Add == GetOperationFromChar(Tokens[i][0]) && Tokens[i].Length == 1)
@@ -473,7 +467,6 @@ internal class Function
             }
 
             // After we do the same with * and /
-            //for (int i = Tokens.Count() - 1; i >= 0; i--)
             for (int i = 0; i < Tokens.Count(); i++)
             {
                 if (Operation.Div == GetOperationFromChar(Tokens[i][0]) && Tokens[i].Length == 1)
@@ -498,7 +491,7 @@ internal class Function
         strFunction = RemoveSpaces(strFunction);
         strFunction = ParseName(strFunction);
         if (_BuildInFunctions.ContainsKey(Name))
-            throw new Exception("The function " + Name + " allready exist");
+            throw new Exception("The function " + Name + " already exists");
         strFunction = GetExpresion(strFunction);
         var Tokens = GetTokensFromFunction(strFunction);
         node = GetNodeFromTokens(Tokens);
