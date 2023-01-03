@@ -73,12 +73,24 @@ while (true)
             }
             catch (Exception e)
             {
+                Console.WriteLine("<DEBUG>");
+                Console.WriteLine("inner catch"); // DEBUG
+                Console.WriteLine(e);
+                Console.WriteLine(e.StackTrace);
+                Console.WriteLine(e.Source);
+                Console.WriteLine("</DEBUG>");
                 Console.WriteLine(e.Message);
             }
         }
     }
     catch (Exception e)
     {
+        Console.WriteLine("<DEBUG>");
+        Console.WriteLine("outer catch"); // DEBUG
+        Console.WriteLine(e);
+        Console.WriteLine(e.StackTrace);
+        Console.WriteLine(e.Source);
+        Console.WriteLine("</DEBUG>");
         Console.WriteLine(e.Message);
     }
 }
