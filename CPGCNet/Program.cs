@@ -45,6 +45,7 @@ while (true)
     }
     try
     {
+        // replaces ',' with '.' 
         for (int i = 0; i < Input?.Length; i++)
             Input = Input.Replace('.', ',');
         if (double.TryParse(Input?.Split('(')[1].Split(')')[0], out double num)) // Name(10) // call function
