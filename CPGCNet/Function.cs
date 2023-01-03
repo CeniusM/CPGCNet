@@ -51,7 +51,7 @@ internal class Node
     private Type _type;
 
     private Operation _operation;
-    private ValueContainer _value;
+    private ValueContainer? _value;
 
     /// <summary>
     /// Opertation Node
@@ -184,12 +184,12 @@ internal class Function
         { "cos", x => Math.Cos(x) },
         { "tan", x => Math.Tan(x) },
         { "sqrt", x => Math.Sqrt(x) },
+        { "floor", x => Math.Floor(x) },
         { "log", x => Math.Log(x) },
         { "abs", x => Math.Abs(x) },
         { "sqr", x => x * x},
         { "PI", x => Math.PI },
         { "E", x => Math.E },
-        { "floor", x => Math.Floor(x) },
     };
     public static bool FunctionAllreadyBuildIn(string functionName) => _BuildInFunctions.ContainsKey(functionName);
 
