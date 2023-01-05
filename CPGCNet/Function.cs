@@ -51,7 +51,7 @@ internal class Node
     private Type _type;
 
     private Operation _operation;
-    private ValueContainer _value;
+    private ValueContainer? _value;
 
     /// <summary>
     /// Opertation Node
@@ -186,9 +186,10 @@ internal class Function
         { "sqrt", x => Math.Sqrt(x) },
         { "log", x => Math.Log(x) },
         { "abs", x => Math.Abs(x) },
-        { "square", x => x * x },
+        { "sqr", x => x * x},
         { "PI", x => Math.PI },
         { "E", x => Math.E },
+        { "floor", x => Math.Floor(x) },
     };
     public static bool FunctionAllreadyBuildIn(string functionName) => _BuildInFunctions.ContainsKey(functionName);
 
@@ -367,7 +368,7 @@ internal class Function
              * Now we try and put into a hierarchy
              * Example:
              * 1 + sin(x) * 0.3 / 3 - x * customFunc(4) 
-             * =
+             *  
              *              
              *                "-"
              *                / \___________
